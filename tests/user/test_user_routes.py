@@ -13,7 +13,8 @@ def test_signup():
         "password" : "password1"
     }
     
-    response = client.post('/user/singup/' , json=signup_data)
+    response = client.post('/user/signup/', json=signup_data)
+
     assert response.status_code == 200
     assert response.json() == {
         "message": "User has been created successfully"
