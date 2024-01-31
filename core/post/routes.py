@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends , HTTPException
+from fastapi import APIRouter, Depends , HTTPException ,Query
 from sqlalchemy.orm import Session
-from sqlalchemy_pagination import paginate
+from sqlalchemy import desc, asc
 from dependencies import get_db,get_current_user,get_pagination,paginate_query
 from core.user.models import User
 from .schema import CreateUpdatePost
@@ -27,13 +27,23 @@ def create_post(post_data:CreateUpdatePost,db: Session = Depends(get_db),user:Us
 
 
 @post_router.get('/posts')
-def list_post(db:Session = Depends(get_db),user : User=Depends(get_current_user),page: dict = Depends(get_pagination)):
+def list_post(db:Session = Depends(get_db),user : User=Depends(get_current_user),page: dict = Depends(get_pagination),order: str = Query("asc", alias="order")):
+
+    allowed_sort_orders = ["asc", "desc"]
+
+    if order.lower() not in allowed_sort_orders:
+        raise HTTPException(status_code=400, detail="Invalid sort order")
+
     posts = db.query(Post)
+
     paginated_result = paginate_query(
-        posts,
+        posts.order_by(
+            Post.title.asc() if order.lower() == "asc" else Post.title.desc()
+        ),
         page["page"],
         page["page_size"],
     )
+
 
     paginated_posts = paginated_result.items
     total_pages = paginated_result.pages
