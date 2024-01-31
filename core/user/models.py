@@ -17,7 +17,7 @@ class User(Base):
     username = Column(String,unique=True,index=True)
     email = Column(String,unique=True,index=True)
     hashed_password = Column(String)
-    
+    tags = Column(String)
   
     def hash_password(self,password:str):
         self.hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')

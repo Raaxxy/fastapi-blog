@@ -18,14 +18,6 @@ def create_post(post_data:CreateUpdatePost,db: Session = Depends(get_db),user:Us
         "data" : post_data
     }
 
-
-
-
-
-
-
-
-
 @post_router.get('/posts')
 def list_post(db:Session = Depends(get_db),user : User=Depends(get_current_user),page: dict = Depends(get_pagination),order: str = Query("asc", alias="order")):
 
@@ -43,7 +35,6 @@ def list_post(db:Session = Depends(get_db),user : User=Depends(get_current_user)
         page["page"],
         page["page_size"],
     )
-
 
     paginated_posts = paginated_result.items
     total_pages = paginated_result.pages
@@ -68,18 +59,6 @@ def list_post(db:Session = Depends(get_db),user : User=Depends(get_current_user)
     }
 
     return response_data
-
-
-
-
-
-
-
-
-
-
-
-
 
 @post_router.get("/post/{post_id}")
 def view_post(post_id:str , db:Session= Depends(get_db),user: User=Depends(get_current_user)):
@@ -106,3 +85,48 @@ def delete_post(post_id:str, post:Post = Depends(get_post_for_user),db:Session =
     return{
         "message" : "Post deleted successfully"
     }
+
+# @post_router.get('/dashboard', response_model=list[Post])
+# def user_dashboard(db: Session = Depends(get_db),user: User = Depends(get_current_user),  page: int = Depends(get_pagination),sort_by: Optional[str] = Query("relevance", alias="sort_by"),order: Optional[str] = Query("desc", alias="order")):
+    
+#     allowed_sort_columns = ["relevance", "title"]
+
+#     if sort_by not in allowed_sort_columns:
+#         raise HTTPException(status_code=400, detail="Invalid sort column")
+
+#     if order.lower() not in ["asc", "desc"]:
+#         raise HTTPException(status_code=400, detail="Invalid sort order")
+
+#     posts = db.query(Post)
+
+#     paginated_result = paginate_query(
+#         posts.order_by(
+#             Post.title.asc() if order.lower() == "asc" else Post.title.desc()
+#         ),
+#         page["page"],
+#         page["page_size"],
+#     )
+
+#     paginated_posts = paginated_result.items
+#     total_pages = paginated_result.pages
+
+#     current_page = page["page"]
+#     next_page = current_page + 1 if current_page < total_pages else None
+#     prev_page = current_page - 1 if current_page > 1 else None
+
+#     base_url = f"/posts?page_size={page['page_size']}"
+#     next_page_url = f"{base_url}&page={next_page}" if next_page else None
+#     prev_page_url = f"{base_url}&page={prev_page}" if prev_page else None
+
+
+#     response_data = {
+#         "data": [post.__dict__ for post in paginated_posts],
+#         "page_info": {
+#             "current_page": current_page,
+#             "total_pages": total_pages,
+#             "next_page": next_page_url,
+#             "prev_page": prev_page_url,
+#         }
+#     }
+
+#     return response_data

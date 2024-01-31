@@ -12,3 +12,4 @@ class Post(Base):
     content = Column(String)
     author_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     author = relationship("User", backref="posts")
+    tags = Column(String)

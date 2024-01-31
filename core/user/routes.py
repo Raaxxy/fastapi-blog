@@ -8,7 +8,7 @@ user_router = APIRouter()
 
 @user_router.post('/signup')
 def signup(user_data:UserCreate,db: Session = Depends(get_db)):
-    user = User(username=user_data.username, email=user_data.email)
+    user = User(username=user_data.username, email=user_data.email, tags=user_data.tags)
     user.hash_password(user_data.password)
     db.add(user)
     db.commit()
