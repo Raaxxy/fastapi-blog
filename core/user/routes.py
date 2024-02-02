@@ -1,8 +1,9 @@
+import re
 from fastapi import APIRouter, HTTPException,Depends, Query
-from sqlalchemy.orm import Session
-
-from core.post.routes import get_blogs_by_tags
+from sqlalchemy import func, cast, ARRAY, String
+from sqlalchemy.orm import Session,joinedload
 from .models import User
+from core.post.models import Post
 from dependencies import get_db,get_current_user, get_pagination, paginate_query
 from .schema import UserCreate,UserLogin, Token
 from typing import List
@@ -45,4 +46,55 @@ def remove_tags(tags: List[str], user: User = Depends(get_current_user), db: Ses
         "message": "Tags removed successfully"
     }
 
+#potential dashboard feature
 
+# @user_router.get('/dashboard')
+# def dashboard(db: Session = Depends(get_db), user: User = Depends(get_current_user),
+#               page: dict = Depends(get_pagination), order: str = Query("asc", alias="order")):
+
+#     allowed_sort_orders = ["asc", "desc"]
+
+#     if order.lower() not in allowed_sort_orders:
+#         raise HTTPException(status_code=400, detail="Invalid sort order")
+
+#     user_tags = user.tags
+
+#     if not user_tags:
+#         return {"message": "User has no followed tags"}
+   
+#     all_posts = db.query(Post)
+#     print(all_posts)
+
+#     posts = all_posts.filter(Post.tags.op('&&')(user_tags))
+#     print(posts)
+
+
+#     sort_column = Post.title.asc() if order.lower() == "asc" else Post.title.desc()
+#     paginated_result = paginate_query(
+#         posts.order_by(sort_column),
+#         page["page"],
+#         page["page_size"],
+#     )
+
+#     paginated_posts = paginated_result.items
+#     total_pages = paginated_result.pages
+
+#     current_page = page["page"]
+#     next_page = current_page + 1 if current_page < total_pages else None
+#     prev_page = current_page - 1 if current_page > 1 else None
+
+#     base_url = f"/dashboard?page_size={page['page_size']}&order={order}"
+#     next_page_url = f"{base_url}&page={next_page}" if next_page else None
+#     prev_page_url = f"{base_url}&page={prev_page}" if prev_page else None
+
+#     response_data = {
+#         "data": [post.__dict__ for post in paginated_posts],
+#         "page_info": {
+#             "current_page": current_page,
+#             "total_pages": total_pages,
+#             "next_page": next_page_url,
+#             "prev_page": prev_page_url,
+#         }
+#     }
+
+#     return response_data
