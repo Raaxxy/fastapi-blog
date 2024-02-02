@@ -1,17 +1,23 @@
 from logging.config import fileConfig
-
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
+import os
+from dotenv import find_dotenv
 from alembic import context
-from decouple import config as envconfig
+from decouple import Config,RepositoryEnv
 from core.user.models import User
 from core.post.models import Post
 from database import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+
 config = context.config
+envconfig =  Config(RepositoryEnv(".env"))
+app_env = os.getenv('APP_ENV', 'dev')
+if(app_env == 'prod'):
+    env_path = find_dotenv('.env.prod')
+    envconfig =  Config(RepositoryEnv(".env.prod"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -19,11 +25,12 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-section = config.config_ini_section
-config.set_section_option(section,"DB_USERNAME",envconfig('DB_USERNAME'))
-config.set_section_option(section,"DB_PASSWORD",envconfig('DB_PASSWORD'))
-config.set_section_option(section,"DB_NAME",envconfig('DB_NAME'))
+# section = config.config_ini_section
+# config.set_section_option(section,"DB_USERNAME",envconfig('DB_USERNAME'))
+# config.set_section_option(section,"DB_PASSWORD",envconfig('DB_PASSWORD'))
+# config.set_section_option(section,"DB_NAME",envconfig('DB_NAME'))
 
+db_url = f"postgresql://{envconfig('DB_USERNAME')}:{envconfig('DB_PASSWORD')}@{envconfig('DB_HOST')}/{envconfig('DB_NAME')}"
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
@@ -34,7 +41,7 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
+config.set_main_option('sqlalchemy.url',db_url)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -67,8 +74,10 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    config_section = config.get_section(config.config_ini_section)
+    config_section['sqlalchemy.url'] = db_url
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config_section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

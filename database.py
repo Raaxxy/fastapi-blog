@@ -7,7 +7,7 @@ from config import get_settings
 settings = get_settings()
 
 
-DATABASE_URL = f'postgresql://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@localhost/{settings.DB_NAME}'
+DATABASE_URL = f'postgresql://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@{settings.DB_HOST}/{settings.DB_NAME}'
 
 
 

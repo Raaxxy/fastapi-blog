@@ -1,15 +1,24 @@
-from pydantic_settings import BaseSettings
-
+from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
 from functools import lru_cache
 
+
+def get_app_env():
+    app_env = os.getenv('APP_ENV','dev')
+
+    if(app_env == 'prod'):
+        return '.env.prod'
+    else:
+        return '.env'
+    
 class Settings(BaseSettings):
     DB_NAME:str
     DB_USERNAME:str
     DB_PASSWORD:str
+    DB_HOST:str
     SECRET_KEY:str
-    class Config:
-        env_file:str = '.env'
+    model_config = SettingsConfigDict(env_file = get_app_env())
 
-
+@lru_cache
 def get_settings() -> Settings:
     return Settings()
