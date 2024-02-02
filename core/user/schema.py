@@ -1,10 +1,11 @@
 from pydantic import BaseModel
+from typing import List
 
 class UserCreate(BaseModel):
     username:str
     email:str
     password:str
-    tags:str
+    tags:List[str]
 
 class UserLogin(BaseModel):
     username:str

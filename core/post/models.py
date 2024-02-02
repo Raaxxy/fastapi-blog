@@ -1,4 +1,4 @@
-from sqlalchemy import Integer,Column,ForeignKey,String
+from sqlalchemy import Integer,Column,ForeignKey,String, ARRAY
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from database import Base 
@@ -12,4 +12,4 @@ class Post(Base):
     content = Column(String)
     author_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     author = relationship("User", backref="posts")
-    tags = Column(String)
+    tags = Column(ARRAY(String), default=[])

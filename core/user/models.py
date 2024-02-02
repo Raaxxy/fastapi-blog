@@ -1,4 +1,4 @@
-from sqlalchemy import Integer,Column,ForeignKey,String
+from sqlalchemy import Integer,Column,ForeignKey,String , ARRAY
 from sqlalchemy.orm import relationship
 from config import get_settings
 from sqlalchemy.dialects.postgresql import UUID
@@ -17,8 +17,8 @@ class User(Base):
     username = Column(String,unique=True,index=True)
     email = Column(String,unique=True,index=True)
     hashed_password = Column(String)
-    tags = Column(String)
-  
+    tags = Column(ARRAY(String), server_default='{}', nullable=False)
+    
     def hash_password(self,password:str):
         self.hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
     
@@ -32,4 +32,13 @@ class User(Base):
             "exp" : expiration
         }
         return jwt.encode(payload,f"{get_settings().SECRET_KEY}", algorithm = "HS256")
+        
+    def add_tag(self, tag: str):
+        if tag not in self.tags:
+            self.tags.append(tag)
+
+
+    def remove_tag(self, tag: str):
+        if tag in self.tags:
+            self.tags.remove(tag)
 
