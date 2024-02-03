@@ -1,0 +1,14 @@
+version: "2.24.4"
+
+volumes:
+  app_data:
+
+services:
+  app:
+    build: .
+    image: fastapiblog
+    container_name: blogapi
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_data:/app_data
