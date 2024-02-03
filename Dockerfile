@@ -3,7 +3,7 @@ FROM python:3.10-slim
 #Set Env variables
 ENV PYTHONDONTWRITEBYCODE 1
 ENV PYTHONBUFFERED 1
-ENV APP_ENV dev
+ENV APP_ENV prod
 
 #Create the working directory
 WORKDIR /app
